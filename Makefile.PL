@@ -1,0 +1,16 @@
+use strict;
+use inc::Module::Install;
+name 'POE-Component-Metabase-Client-Submit';
+author 'Chris Williams <chris@bingosnet.co.uk>';
+version_from 'lib/POE/Component/Metabase/Client/Submit.pm';
+abstract_from 'lib/POE/Component/Metabase/Client/Submit.pm';
+perl_version '5.006';
+license 'perl';
+build_requires 'Test::More' => 0.47;
+requires 'POE' => 1.004;
+requires 'JSON' => 2.14;
+requires 'URI' => 0;
+requires 'HTTP::Request::Common' => 0;
+requires 'POE::Component::Client::HTTP' => 0.88;
+auto_set_repository;
+WriteAll();
