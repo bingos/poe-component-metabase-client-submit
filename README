@@ -1,4 +1,0 @@
-POE::Component::Metabase::Client::Submit
-========================================
-
-Asynchronous implementation of the submission process to a Metabase.
