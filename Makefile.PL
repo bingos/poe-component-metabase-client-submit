@@ -13,6 +13,7 @@ requires 'HTTP::Request::Common' => '5.824';
 requires 'JSON' => '2.17';
 requires 'POE' => '1.287';
 requires 'POE::Component::Client::HTTP' => '0.895';
+requires 'POE::Component::SSLify' => '0.15';
 requires 'URI' => '1.52';
 githubmeta;
 auto_provides;
