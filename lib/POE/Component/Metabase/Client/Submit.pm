@@ -14,7 +14,7 @@ $VERSION = '0.02';
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(profile secret uri fact event session http_alias);
+  @valid_args = qw(profile secret uri fact event session http_alias context);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -30,7 +30,7 @@ sub submit {
     [ %opts ],
     { 
       ( map { $_ => 0 } @valid_args ), 
-      ( map { $_ => 1 } qw(profile secret uri event) ) 
+      ( map { $_ => 1 } qw(profile secret uri event fact) ) 
     } # hehe
   );
 
@@ -38,8 +38,10 @@ sub submit {
 
   Carp::confess( "'profile' argument for $class must be a Metabase::User::Profile" )
     unless $self->profile->isa('Metabase::User::Profile');
-  Carp::confess( "'profile' argument for $class must be a Metabase::User::secret" )
+  Carp::confess( "'secret' argument for $class must be a Metabase::User::secret" )
     unless $self->secret->isa('Metabase::User::Secret');
+  Carp::confess( "'secret' argument for $class must be a Metabase::Fact" )
+    unless $self->secret->isa('Metabase::Fact');
 
   $self->{session_id} = POE::Session->create(
 	  object_states => [
@@ -167,7 +169,7 @@ sub _response {
   if ( $tag eq 'guid' ) { 
     if ( $res->is_success ) {
       $self->{_error} = 'authentication failed';
-      # dispatch
+      $kernel->yield( '_dispatch' );
       return;
     }
     $kernel->yield( '_register' );
@@ -176,14 +178,14 @@ sub _response {
   if ( $tag eq 'register' ) {
     unless ( $res->is_success ) {
       $self->{_error} = 'registration failed';
-      # dispatch
+      $kernel->yield( '_dispatch' );
       return;
     }
     $kernel->yield( '_submit' );
     return;
   }
   unless ( $res->is_success ) {
-    $self->{_error} = 'fact submission failed';
+    $self->{_error} = "fact submission failed\n" . $res->content;
   }
   else {
     $self->{success} = 1;
@@ -193,7 +195,17 @@ sub _response {
 }
 
 sub _dispatch {
-  
+  my ($kernel,$self) = @_[KERNEL,OBJECT];
+  $kernel->post( $self->{http_id}, 'shutdown' ) 
+    if $self->{my_httpc};
+  my $ref = {};
+  for ( qw(_error success context) ) {
+    $ref->{$_} = $self->{$_} if $self->{$_};
+  }
+  $ref->{error} = delete $ref->{_error} if $ref->{_error};
+  $kernel->post( $self->{sender_id}, $self->event, $ref );
+  $kernel->refcount_decrement( $self->{sender_id}, __PACKAGE__ );
+  return;
 }
 
 #--------------------------------------------------------------------------#
@@ -245,3 +257,96 @@ sub _error {
 
 'Submit this';
 __END__
+
+=head1 NAME
+
+POE::Component::Metabase::Client::Submit - a POE client that submits to Metabase servers
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+POE::Component::Metabase::Client::Submit provides a L<POE> mechanism for submitting facts
+to a L<Metabase> web server.
+
+=head1 CONSTRUCTOR
+
+=over
+
+=item C<submit>
+
+  POE::Component::Metabase::Client::Submit->spawn( %args );
+
+Constructs a POE session that will manage submitting a L<Metabase> fact to a L<Metabase> web
+server.
+
+Takes a number of mandatory arguments:
+
+ 'profile', a Metabase::User::Profile object
+ 'secret', a Metabase::User::Secret object
+ 'fact', a Metabase::Fact object  
+ 'event', an event handler in the calling session to invoke on completion
+
+And some optional arguments:
+
+ 'session', a session alias, reference or ID to send 'event' to instead of the calling session
+ 'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
+ 'context', anything that can be stored in a scalar that is meaningful to you.
+
+=back
+
+=head1 OUTPUT EVENT
+
+An event will be sent to either the calling session or the session specified with C<session>
+during C<submit>.
+
+C<ARG0> of the event will be a hashref with the following keys:
+
+=over
+
+=item C<success>
+
+Indicates that the submission was successful.
+
+=item C<error>
+
+If there was an error this will contain a string indicating the error that occurred.
+
+=item C<context>
+
+If you specified C<context> in C<submit>, whatever you passed will be here.
+
+=back
+
+=head1 AUTHORS
+
+  David A. Golden (DAGOLDEN)
+  
+  Ricardo SIGNES (RJBS)
+
+  Chris Williams (BINGOS)
+
+=head1 COPYRIGHT AND LICENSE
+
+  Portions Copyright (c) 2008 by Ricardo SIGNES
+  Portions Copyright (c) 2009-2010 by David A. Golden
+  Portions Copyright (c) 2010 by Chris Williams
+
+Licensed under the same terms as Perl itself (the "License").
+You may not use this file except in compliance with the License.
+A copy of the License was distributed with this file or you may obtain a
+copy of the License from http://dev.perl.org/licenses/
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=head1 SEE ALSO
+
+L<Metabase>
+
+L<POE>
+
+=cut

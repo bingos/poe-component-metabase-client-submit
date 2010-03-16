@@ -1,0 +1,74 @@
+NAME
+    POE::Component::Metabase::Client::Submit - a POE client that submits to
+    Metabase servers
+
+SYNOPSIS
+DESCRIPTION
+    POE::Component::Metabase::Client::Submit provides a POE mechanism for
+    submitting facts to a Metabase web server.
+
+CONSTRUCTOR
+    "submit"
+          POE::Component::Metabase::Client::Submit->spawn( %args );
+
+        Constructs a POE session that will manage submitting a Metabase fact
+        to a Metabase web server.
+
+        Takes a number of mandatory arguments:
+
+         'profile', a Metabase::User::Profile object
+         'secret', a Metabase::User::Secret object
+         'fact', a Metabase::Fact object  
+         'event', an event handler in the calling session to invoke on completion
+
+        And some optional arguments:
+
+         'session', a session alias, reference or ID to send 'event' to instead of the calling session
+         'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
+         'context', anything that can be stored in a scalar that is meaningful to you.
+
+OUTPUT EVENT
+    An event will be sent to either the calling session or the session
+    specified with "session" during "submit".
+
+    "ARG0" of the event will be a hashref with the following keys:
+
+    "success"
+        Indicates that the submission was successful.
+
+    "error"
+        If there was an error this will contain a string indicating the
+        error that occurred.
+
+    "context"
+        If you specified "context" in "submit", whatever you passed will be
+        here.
+
+AUTHORS
+      David A. Golden (DAGOLDEN)
+  
+      Ricardo SIGNES (RJBS)
+
+      Chris Williams (BINGOS)
+
+COPYRIGHT AND LICENSE
+      Portions Copyright (c) 2008 by Ricardo SIGNES
+      Portions Copyright (c) 2009-2010 by David A. Golden
+      Portions Copyright (c) 2010 by Chris Williams
+
+    Licensed under the same terms as Perl itself (the "License"). You may
+    not use this file except in compliance with the License. A copy of the
+    License was distributed with this file or you may obtain a copy of the
+    License from http://dev.perl.org/licenses/
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+SEE ALSO
+    Metabase
+
+    POE
+
