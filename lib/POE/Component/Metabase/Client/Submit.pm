@@ -286,6 +286,7 @@ Takes a number of mandatory arguments:
  'secret', a Metabase::User::Secret object
  'fact', a Metabase::Fact object  
  'event', an event handler in the calling session to invoke on completion
+ 'uri', the uri of a Metabase server to submit to.
 
 And some optional arguments:
 
