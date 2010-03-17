@@ -5,7 +5,7 @@ use warnings;
 use Carp ();
 use HTTP::Status qw[:constants];
 use HTTP::Request::Common ();
-use JSON;
+use JSON ();
 use POE qw[Component::Client::HTTP];
 use URI;
 use vars qw[$VERSION];
