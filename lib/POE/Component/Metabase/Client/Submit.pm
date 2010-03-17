@@ -264,6 +264,37 @@ POE::Component::Metabase::Client::Submit - a POE client that submits to Metabase
 
 =head1 SYNOPSIS
 
+  use strict;
+  use warnings;
+  use POE qw[Component::Metabase::Client::Submit];
+
+  POE::Session->create(
+    package_states => [
+      'main' => [qw(_start _status)],
+    ],
+  );
+
+  sub _start {
+    POE::Component::Metabase::Client::Submit->submit(
+      event   => '_status',
+      uri     => 'https://foo.bar.com/metabase/',
+      fact    => $metabase_fact_object,
+      profile => $metabase_user_profile_object,
+      secret  => $metabase_user_secret_object,
+    );
+    return;
+  }
+
+  sub _status {
+    my $data = $_[ARG0];
+
+    print "Success!\n" if $data->{success};
+
+    print $data->{error}, "\n" if $data->{error};
+
+    return;
+  }
+
 =head1 DESCRIPTION
 
 POE::Component::Metabase::Client::Submit provides a L<POE> mechanism for submitting facts
