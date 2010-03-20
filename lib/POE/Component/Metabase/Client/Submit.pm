@@ -10,7 +10,7 @@ use POE qw[Component::Client::HTTP];
 use URI;
 use vars qw[$VERSION];
 
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 my @valid_args;
 BEGIN {
@@ -185,11 +185,12 @@ sub _response {
     return;
   }
   unless ( $res->is_success ) {
-    $self->{_error} = "fact submission failed\n" . $res->content;
+    $self->{_error} = "fact submission failed";
   }
   else {
     $self->{success} = 1;
   }
+  $self->{content} = $res->content;
   $kernel->yield( '_dispatch' );
   return;
 }
@@ -199,7 +200,7 @@ sub _dispatch {
   $kernel->post( $self->{http_id}, 'shutdown' ) 
     if $self->{my_httpc};
   my $ref = {};
-  for ( qw(_error success context) ) {
+  for ( qw(_error success context content) ) {
     $ref->{$_} = $self->{$_} if $self->{$_};
   }
   $ref->{error} = delete $ref->{_error} if $ref->{_error};
@@ -347,6 +348,10 @@ If there was an error this will contain a string indicating the error that occur
 =item C<context>
 
 If you specified C<context> in C<submit>, whatever you passed will be here.
+
+=item <content>
+
+This will contain the content of any HTTP responses whether success or failure.
 
 =back
 

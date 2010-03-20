@@ -9,7 +9,7 @@ perl_version '5.006';
 license 'perl';
 auto_license holder => 'Chris Williams, David Golden and Ricardo Signes',
 build_requires 'Test::More' => 0.47;
-#build_requires 'Test::POE::Server::TCP' => '1.08';
+#build_requires 'Test::POE::Server::TCP' => '1.10';
 #build_requires 'POE::Filter::HTTP::Parser' => '1.02';
 requires 'HTTP::Request::Common' => '5.824';
 requires 'JSON' => '2.17';
@@ -22,4 +22,5 @@ requires 'Metabase::User::Secret' => 0.003;
 requires 'URI' => '1.52';
 githubmeta;
 auto_provides;
+makemaker_args(dist => { PREOP => "$^X ./tools/git-log.pl > ./Changes" });
 WriteAll();
