@@ -1,1 +1,19 @@
-======
+==============================
+2010-03-20 22:14:02 +0000 0.04
+==============================
+
+  commit dfb140bbc64ed8b6da37bc8ea5950fc43b94d4c4
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sat Mar 20 22:14:02 2010 +0000
+  
+    Added 'content' to the hashref returned in output events
+
+  commit 8167012fd81e028850a397b384bc771a0ecd8b2b
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Mar 17 21:18:08 2010 +0000
+  
+    Added MANIFEST 
+
+==============
+End of Excerpt
+==============

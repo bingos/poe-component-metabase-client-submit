@@ -76,6 +76,10 @@ OUTPUT EVENT
         If you specified "context" in "submit", whatever you passed will be
         here.
 
+    <content>
+        This will contain the content of any HTTP responses whether success
+        or failure.
+
 AUTHORS
       David A. Golden (DAGOLDEN)
   
