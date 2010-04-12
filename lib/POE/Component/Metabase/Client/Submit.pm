@@ -10,7 +10,7 @@ use POE qw[Component::Client::HTTP];
 use URI;
 use vars qw[$VERSION];
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 my @valid_args;
 BEGIN {
@@ -169,6 +169,7 @@ sub _response {
   if ( $tag eq 'guid' ) { 
     if ( $res->is_success ) {
       $self->{_error} = 'authentication failed';
+      $self->{content} = $res->content;
       $kernel->yield( '_dispatch' );
       return;
     }
@@ -178,6 +179,7 @@ sub _response {
   if ( $tag eq 'register' ) {
     unless ( $res->is_success ) {
       $self->{_error} = 'registration failed';
+      $self->{content} = $res->content;
       $kernel->yield( '_dispatch' );
       return;
     }

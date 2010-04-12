@@ -1,4 +1,15 @@
 ==============================
+2010-03-20 22:18:20 +0000 0.06
+==============================
+
+  commit fcc83d9049ce9f7bd748b0da23aab27258d17de0
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Sat Mar 20 22:18:20 2010 +0000
+  
+    Forgot to add the git-log tool to MANIFEST. Probably not an issue,
+    but better safe than sorry 
+
+==============================
 2010-03-20 22:14:02 +0000 0.04
 ==============================
 
