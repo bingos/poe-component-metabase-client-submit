@@ -10,7 +10,7 @@ use POE qw[Component::Client::HTTP];
 use URI;
 use vars qw[$VERSION];
 
-$VERSION = '0.08';
+$VERSION = '0.10';
 
 my @valid_args;
 BEGIN {
@@ -83,7 +83,7 @@ sub _start {
     POE::Component::Client::HTTP->spawn(
         Alias           => $self->{http_id},
 	      FollowRedirects => 2,
-        Timeout         => 60,
+        Timeout         => 120,
         Agent           => 'Mozilla/5.0 (X11; U; Linux i686; en-US; '
                 . 'rv:1.1) Gecko/20020913 Debian/1.1-1',
     );
