@@ -1,4 +1,15 @@
 ==============================
+2010-04-12 13:26:24 +0100 0.08
+==============================
+
+  commit bee24fcc875ffe77d65c8ffa3d15be9b68b80720
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Mon Apr 12 13:26:24 2010 +0100
+  
+    Had neglected to populate the content field for authentication and
+    registration errors. 
+
+==============================
 2010-03-20 22:18:20 +0000 0.06
 ==============================
 
