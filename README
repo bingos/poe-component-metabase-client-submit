@@ -49,7 +49,7 @@ CONSTRUCTOR
 
          'profile', a Metabase::User::Profile object
          'secret', a Metabase::User::Secret object
-         'fact', a Metabase::Fact object  
+         'fact', a Metabase::Fact object
          'event', an event handler in the calling session to invoke on completion
          'uri', the uri of a Metabase server to submit to.
 
@@ -58,6 +58,7 @@ CONSTRUCTOR
          'session', a session alias, reference or ID to send 'event' to instead of the calling session
          'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
          'context', anything that can be stored in a scalar that is meaningful to you.
+         'resolver', a reference to a POE::Component::Resolver object to use (ignored if http_alias is used).
 
 OUTPUT EVENT
     An event will be sent to either the calling session or the session
@@ -82,7 +83,7 @@ OUTPUT EVENT
 
 AUTHORS
       David A. Golden (DAGOLDEN)
-  
+
       Ricardo SIGNES (RJBS)
 
       Chris Williams (BINGOS)
