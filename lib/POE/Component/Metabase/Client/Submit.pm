@@ -6,7 +6,7 @@ use Carp ();
 use HTTP::Status qw[:constants];
 use HTTP::Request::Common ();
 use JSON ();
-use POE qw[Component::Client::HTTP];
+use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
 use vars qw[$VERSION];
 
@@ -14,7 +14,7 @@ $VERSION = '0.10';
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(profile secret uri fact event session http_alias context);
+  @valid_args = qw(profile secret uri fact event session http_alias context resolver);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -28,9 +28,9 @@ sub submit {
   my $options = delete $opts{options};
   my $args = $class->__validate_args(
     [ %opts ],
-    { 
-      ( map { $_ => 0 } @valid_args ), 
-      ( map { $_ => 1 } qw(profile secret uri event fact) ) 
+    {
+      ( map { $_ => 0 } @valid_args ),
+      ( map { $_ => 1 } qw(profile secret uri event fact) )
     } # hehe
   );
 
@@ -80,12 +80,19 @@ sub _start {
   }
   unless ( $self->{http_id} ) {
     $self->{http_id} = 'metabaseclient' . $$ . $self->{session_id};
+    my $ka;
+    if ( $self->resolver ) {
+      $ka = POE::Component::Client::Keepalive->new(
+        resolver => $self->resolver,
+      );
+    }
     POE::Component::Client::HTTP->spawn(
         Alias           => $self->{http_id},
 	      FollowRedirects => 2,
         Timeout         => 120,
         Agent           => 'Mozilla/5.0 (X11; U; Linux i686; en-US; '
                 . 'rv:1.1) Gecko/20020913 Debian/1.1-1',
+        ( defined $ka ? ( ConnectionManager => $ka ) : () ),
     );
     $self->{my_httpc} = 1;
   }
@@ -128,7 +135,7 @@ sub _register {
   my $req_uri = $self->_abs_uri('register');
 
   for my $type ( qw/profile secret/ ) {
-    $self->$type->set_creator( $self->$type->resource ) 
+    $self->$type->set_creator( $self->$type->resource )
       unless $self->$type->creator;
   }
 
@@ -166,7 +173,7 @@ sub _response {
     $kernel->yield( '_guid_exists' );
     return;
   }
-  if ( $tag eq 'guid' ) { 
+  if ( $tag eq 'guid' ) {
     if ( $res->is_success ) {
       $self->{_error} = 'authentication failed';
       $self->{content} = $res->content;
@@ -199,7 +206,7 @@ sub _response {
 
 sub _dispatch {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  $kernel->post( $self->{http_id}, 'shutdown' ) 
+  $kernel->post( $self->{http_id}, 'shutdown' )
     if $self->{my_httpc};
   my $ref = {};
   for ( qw(_error success context content) ) {
@@ -252,7 +259,7 @@ sub _error {
   if ( ref($res) && $res->header('Content-Type') eq 'application/json') {
     my $entity = JSON->new->decode($res->content);
     return "$prefix\: $entity->{error}";
-  } 
+  }
   else {
     return "$prefix\: " . $res->message;
   }
@@ -318,7 +325,7 @@ Takes a number of mandatory arguments:
 
  'profile', a Metabase::User::Profile object
  'secret', a Metabase::User::Secret object
- 'fact', a Metabase::Fact object  
+ 'fact', a Metabase::Fact object
  'event', an event handler in the calling session to invoke on completion
  'uri', the uri of a Metabase server to submit to.
 
@@ -327,6 +334,7 @@ And some optional arguments:
  'session', a session alias, reference or ID to send 'event' to instead of the calling session
  'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
  'context', anything that can be stored in a scalar that is meaningful to you.
+ 'resolver', a reference to a POE::Component::Resolver object to use (ignored if http_alias is used).
 
 =back
 
@@ -360,7 +368,7 @@ This will contain the content of any HTTP responses whether success or failure.
 =head1 AUTHORS
 
   David A. Golden (DAGOLDEN)
-  
+
   Ricardo SIGNES (RJBS)
 
   Chris Williams (BINGOS)
