@@ -10,7 +10,7 @@ use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
 use vars qw[$VERSION];
 
-$VERSION = '0.10';
+$VERSION = '0.12';
 
 my @valid_args;
 BEGIN {
