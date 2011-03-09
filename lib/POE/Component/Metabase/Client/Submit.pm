@@ -174,7 +174,7 @@ sub _response {
     return;
   }
   if ( $tag eq 'guid' ) {
-    if ( $res->is_success ) {
+    unless ( $res->is_success ) {
       $self->{_error} = 'authentication failed';
       $self->{content} = $res->content;
       $kernel->yield( '_dispatch' );
