@@ -5,6 +5,7 @@ use warnings;
 use Carp ();
 use HTTP::Status qw[:constants];
 use HTTP::Request::Common ();
+use HTTP::Message 5.814 (); # for HTTP::Message::decodable() support
 use JSON ();
 use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
@@ -109,9 +110,11 @@ sub _submit {
     unless $fact->creator;
 
   my $req_uri = $self->_abs_uri($path);
+  my $can_decode = HTTP::Message::decodable;
 
   my $req = HTTP::Request::Common::POST(
     $req_uri,
+    ( length $can_decode ? ('Accept-Encoding' => $can_decode) : () ),
     Content_Type => 'application/json',
     Accept       => 'application/json',
     Content      => JSON->new->encode($fact->as_struct),
@@ -132,15 +135,18 @@ sub _guid_exists {
 
 sub _register {
   my ($kernel,$self) = @_[KERNEL,OBJECT];
-  my $req_uri = $self->_abs_uri('register');
 
   for my $type ( qw/profile secret/ ) {
     $self->$type->set_creator( $self->$type->resource )
       unless $self->$type->creator;
   }
 
+  my $req_uri = $self->_abs_uri('register');
+  my $can_decode = HTTP::Message::decodable;
+
   my $req = HTTP::Request::Common::POST(
     $req_uri,
+    ( length $can_decode ? ('Accept-Encoding' => $can_decode) : () ),
     Content_Type => 'application/json',
     Accept       => 'application/json',
     Content      => JSON->new->encode([
@@ -199,7 +205,17 @@ sub _response {
   else {
     $self->{success} = 1;
   }
-  $self->{content} = $res->content;
+
+  # decode the content if we requested it
+  if ( defined $request_packet->[0]->header( 'Accept-Encoding' ) ) {
+    eval { $self->{content} = $res->decoded_content( 'charset' => 'none' ) };
+    if ( $@ ) {
+      $self->{_error} = "unable to decode content: $@";
+      $self->{success} = 0;
+    }
+  } else {
+    $self->{content} = $res->content;
+  }
   $kernel->yield( '_dispatch' );
   return;
 }
