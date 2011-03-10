@@ -9,6 +9,7 @@ perl_version '5.006';
 license 'perl';
 auto_license holder => 'Chris Williams, David Golden and Ricardo Signes',
 build_requires 'Test::More' => 0.47;
+requires 'HTTP::Message' => '5.814';
 requires 'HTTP::Request::Common' => '5.824';
 requires 'JSON' => '2.17';
 requires 'POE' => '1.299';
