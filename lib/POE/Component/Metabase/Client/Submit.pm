@@ -14,7 +14,7 @@ $VERSION = '0.12';
 
 my @valid_args;
 BEGIN {
-  @valid_args = qw(profile secret uri fact event session http_alias context resolver);
+  @valid_args = qw(profile secret uri fact event session http_alias context resolver compress);
 
   for my $arg (@valid_args) {
     no strict 'refs';
@@ -117,6 +117,19 @@ sub _submit {
     Content      => JSON->new->encode($fact->as_struct),
   );
   $req->authorization_basic($self->profile->resource->guid, $self->secret->content);
+
+  # Compress it?
+  if ( defined $self->compress and $self->compress ne 'none' ) {
+    my $err;
+    eval { $req->encode( $self->compress ) };
+    if ( $@ ) {
+      $self->{_error} = "Compression error: $@";
+      $self->{success} = 0;
+      $kernel->yield( '_dispatch' );
+      return;
+    }
+  }
+      
   $kernel->yield( '_http_req', $req, 'submit' );
   return;
 }
@@ -335,6 +348,7 @@ And some optional arguments:
  'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
  'context', anything that can be stored in a scalar that is meaningful to you.
  'resolver', a reference to a POE::Component::Resolver object to use (ignored if http_alias is used).
+ 'compress', a compressor to use - defaults to none ( available compressors: gzip, deflate, x-bzip2, none )
 
 =back
 
