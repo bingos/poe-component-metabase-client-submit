@@ -1,5 +1,7 @@
 package POE::Component::Metabase::Client::Submit;
 
+#ABSTRACT: a POE client that submits to Metabase servers
+
 use strict;
 use warnings;
 use Carp ();
@@ -9,9 +11,6 @@ use HTTP::Message 5.814 (); # for HTTP::Message::decodable() support
 use JSON ();
 use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
-use vars qw[$VERSION];
-
-$VERSION = '0.12';
 
 my @valid_args;
 BEGIN {
@@ -295,11 +294,12 @@ sub _error {
 }
 
 'Submit this';
-__END__
 
-=head1 NAME
+=pod
 
-POE::Component::Metabase::Client::Submit - a POE client that submits to Metabase servers
+=for Pod::Coverage profile secret uri fact event session http_alias context resolver compress
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -394,31 +394,6 @@ If you specified C<context> in C<submit>, whatever you passed will be here.
 This will contain the content of any HTTP responses whether success or failure.
 
 =back
-
-=head1 AUTHORS
-
-  David A. Golden (DAGOLDEN)
-
-  Ricardo SIGNES (RJBS)
-
-  Chris Williams (BINGOS)
-
-=head1 COPYRIGHT AND LICENSE
-
-  Portions Copyright (c) 2008 by Ricardo SIGNES
-  Portions Copyright (c) 2009-2010 by David A. Golden
-  Portions Copyright (c) 2010 by Chris Williams
-
-Licensed under the same terms as Perl itself (the "License").
-You may not use this file except in compliance with the License.
-A copy of the License was distributed with this file or you may obtain a
-copy of the License from http://dev.perl.org/licenses/
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 =head1 SEE ALSO
 
