@@ -8,7 +8,7 @@ use Carp ();
 use HTTP::Status qw[:constants];
 use HTTP::Request::Common ();
 use HTTP::Message 5.814 (); # for HTTP::Message::decodable() support
-use JSON ();
+use JSON::MaybeXS;
 use POE qw[Component::Client::HTTP Component::Client::Keepalive];
 use URI;
 
